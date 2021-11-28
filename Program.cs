@@ -11,9 +11,10 @@ class Program
         var usageProvider = new ApplicationUsage();
 
         var entryAssembly = Assembly.GetEntryAssembly();
-        var files = Directory.EnumerateFiles(Path.GetDirectoryName(entryAssembly.Location), "solutions.dll");
-        var assemblies = files.Select(f => AssemblyLoadContext.Default.LoadFromAssemblyPath(f)).ToList();
-        assemblies.Add(typeof(Program).Assembly);
+        var assemblies = new List<Assembly>
+        {
+            typeof(Program).Assembly
+        };
 
         var tsolvers = assemblies.SelectMany(a => a.GetTypes())
             .Where(t => t.GetTypeInfo().IsClass && typeof(ISolver).IsAssignableFrom(t))
@@ -21,25 +22,25 @@ class Program
             .ToArray();
 
         var action =
-            Command(args, Args("update", "([0-9]+)/([0-9]+)"), m =>
+            Command(args, Args("update", "([0-9]+)[/-]([0-9]+)"), m =>
             {
                 var year = int.Parse(m[1]);
                 var day = int.Parse(m[2]);
-                return () => new Updater().Update(year, day, tsolvers, usageProvider).Wait();
+                return () => Updater.Update(year, day, tsolvers, usageProvider).Wait();
             }) ??
             Command(args, Args("update", "last"), m =>
             {
                 var dt = DateTime.Now;
                 if (dt.Month == 12 && dt.Day >= 1 && dt.Day <= 25)
                 {
-                    return () => new Updater().Update(dt.Year, dt.Day, tsolvers, usageProvider).Wait();
+                    return () => Updater.Update(dt.Year, dt.Day, tsolvers, usageProvider).Wait();
                 }
                 else
                 {
                     throw new Exception("Event is not active. This option works in Dec 1-25 only)");
                 }
             }) ??
-             Command(args, Args("([0-9]+)/([0-9]+)"), m =>
+             Command(args, Args("([0-9]+)[/-]([0-9]+)"), m =>
              {
                  var year = int.Parse(m[0]);
                  var day = int.Parse(m[1]);
@@ -55,14 +56,14 @@ class Program
                                  SolverExtensions.Year(tsolver) == year);
                  return () => Runner.RunAll(tsolversSelected.ToArray());
              }) ??
-            Command(args, Args("([0-9]+)/last"), m =>
+            Command(args, Args("([0-9]+)[/-]last"), m =>
             {
                 var year = int.Parse(m[0]);
                 var tsolversSelected = tsolvers.Last(tsolver =>
                     SolverExtensions.Year(tsolver) == year);
                 return () => Runner.RunAll(tsolversSelected);
             }) ??
-            Command(args, Args("([0-9]+)/all"), m =>
+            Command(args, Args("([0-9]+)[/-]all"), m =>
             {
                 var year = int.Parse(m[0]);
                 var tsolversSelected = tsolvers.Where(tsolver =>
@@ -86,7 +87,7 @@ class Program
         action();
     }
 
-    static Action Command(string[] args, string[] regexes, Func<string[], Action> parse)
+    static Action? Command(string[] args, string[] regexes, Func<string[], Action> parse)
     {
         if (args.Length != regexes.Length)
         {

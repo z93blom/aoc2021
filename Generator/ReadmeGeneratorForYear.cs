@@ -4,7 +4,7 @@ using AdventOfCode.Model;
 namespace AdventOfCode.Generator
 {
     public class ReadmeGeneratorForYear {
-        public string Generate(Calendar calendar) {
+        public static string Generate(Calendar calendar) {
             var calendarLines =
                 string.Join("\n",
                     from line in calendar.Lines

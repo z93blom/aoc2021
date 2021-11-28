@@ -10,6 +10,11 @@ public class Runner
         var lastYear = -1;
         foreach (var solver in tsolvers.Select(tsolver => Activator.CreateInstance(tsolver) as ISolver))
         {
+            if (solver == null)
+            {
+                continue;
+            }
+
             if (lastYear != solver.Year())
             {
                 solver.SplashScreen().Show();
@@ -32,7 +37,7 @@ public class Runner
                     foreach (var file in files)
                     {
 
-                        if (files.Count() > 1)
+                        if (files.Length > 1)
                         {
                             WriteLine(color, "  " + file + ":");
                         }

@@ -18,7 +18,9 @@ public abstract class SplashScreen
         foreach (ConsoleColor cc in Enum.GetValues(typeof(ConsoleColor)))
         {
             var n = Enum.GetName(typeof(ConsoleColor), cc);
+#pragma warning disable CS8604 // Possible null reference argument.
             var c = System.Drawing.Color.FromName(n == "DarkYellow" ? "Orange" : n); // bug fix
+#pragma warning restore CS8604 // Possible null reference argument.
             var t = Math.Pow(c.R - rr, 2.0) + Math.Pow(c.G - gg, 2.0) + Math.Pow(c.B - bb, 2.0);
             if (t == 0.0)
                 return cc;

@@ -1,7 +1,7 @@
 namespace AdventOfCode.Generator
 {
     public class ProjectReadmeGenerator {
-        public string Generate(int firstYear, int lastYear, IUsageProvider usageProvider) {
+        public static string Generate(int firstYear, int lastYear, IUsageProvider usageProvider) {
            
             return $@"
                > # Advent of Code ({firstYear}-{lastYear})
