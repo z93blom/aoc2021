@@ -10,7 +10,6 @@ namespace AdventOfCode.Generator
 
                > ## Dependencies
 
-               > - This library is built for `.Net Standard 2.0`. It should work on Windows, Linux and OS X.
                > - `Newtonsoft.Json` for JSON parsing
                > - `HtmlAgilityPack` is used for problem download.
 
@@ -22,16 +21,16 @@ namespace AdventOfCode.Generator
                > Then you can set it:
 
                > ```
-               > Powershell: $Env:SESSION = {'"'}...{'"'}
+               > Powershell: $Env:{Updater.SessionEnvironmentName} = {'"'}...{'"'}
                > 
-               > Command Prompt: set SESSION = ...
+               > Command Prompt: set {Updater.SessionEnvironmentName} = ...
                > ```
 
                > ## Running
 
                > To run the project:
 
-               > 1. Install .NET Core
+               > 1. Install .NET (6.0 or greater)
                > 2. Clone the repo
                > 3. Get help with `dotnet run`
                > ```
