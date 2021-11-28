@@ -34,7 +34,7 @@ public static class SolverExtensions
 
     public static string WorkingDir(int year)
     {
-        return Path.Combine("src", "app", "Solutions", year.ToString());
+        return Path.Combine("Solutions", $"Y{year}");
     }
 
     public static string WorkingDir(int year, int day)

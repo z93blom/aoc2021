@@ -5,18 +5,13 @@ namespace AdventOfCode.Generator
 
     public class SolutionTemplateGenerator {
         public static string Generate(Problem problem) {
-            return $@"using System;
-                 |using System.Collections.Generic;
-                 |using System.Collections.Immutable;
-                 |using System.Linq;
-                 |using System.Text.RegularExpressions;
-                 |using System.Text;
-                 |using AdventOfCode.Utilities;
-                 |
-                 |namespace AdventOfCode.Y{problem.Year}.Day{problem.Day:00};
+            return $@"namespace AdventOfCode.Y{problem.Year}.Day{problem.Day:00};
                  |
                  |class Solution : ISolver
                  |{{
+                 |    public int Year => {problem.Year};
+                 |
+                 |    public int Day => {problem.Day};
                  |
                  |    public string GetName() => ""{problem.Title}"";
                  |
@@ -33,7 +28,7 @@ namespace AdventOfCode.Generator
                  |
                  |    object PartTwo(string input)
                  |    {{
-                 |            return 0;
+                 |        return 0;
                  |    }}
                  |}}".StripMargin();
         }

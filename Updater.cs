@@ -38,11 +38,6 @@ public class Updater
 
         var years = solvers.Select(tsolver => SolverExtensions.Year(tsolver));
 
-        if (years.Any())
-        {
-            UpdateProjectReadme(years.Min(), years.Max(), usageProvider);
-        }
-
         UpdateReadmeForYear(calendar);
         UpdateSplashScreen(calendar);
         UpdateReadmeForDay(problem);
@@ -93,12 +88,6 @@ public class Updater
         {
             WriteFile(file, SolutionTemplateGenerator.Generate(problem));
         }
-    }
-
-    static void UpdateProjectReadme(int firstYear, int lastYear, IUsageProvider usageProvider)
-    {
-        var file = Path.Combine("README.md");
-        WriteFile(file, ProjectReadmeGenerator.Generate(firstYear, lastYear, usageProvider));
     }
 
     static void UpdateReadmeForYear(Calendar calendar)

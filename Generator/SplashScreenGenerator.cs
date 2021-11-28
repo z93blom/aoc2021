@@ -13,17 +13,17 @@ namespace AdventOfCode.Generator
             return $@"
                 |using System;
                 |
-                |namespace AdventOfCode.Y{calendar.Year} {{
+                |namespace AdventOfCode.Y{calendar.Year};
                 |
-                |    class SplashScreenImpl : AdventOfCode.SplashScreen {{
+                |class SplashScreenImpl : AdventOfCode.SplashScreen
+                |{{
                 |
-                |        public override void Show() {{
-                |
-                |            var color = Console.ForegroundColor;
+                |    public override void Show()
+                |    {{
+                |        var color = Console.ForegroundColor;
                 |            {calendarPrinter.Indent(12)}
                 |            Console.ForegroundColor = color;
                 |            Console.WriteLine();
-                |        }}
                 |    }}
                 |}}".StripMargin();
         }
