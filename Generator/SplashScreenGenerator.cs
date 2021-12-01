@@ -11,19 +11,14 @@ namespace AdventOfCode.Generator
         public string Generate(Calendar calendar) {
             string calendarPrinter = CalendarPrinter(calendar);
             return $@"
-                |using System;
-                |
                 |namespace AdventOfCode.Y{calendar.Year};
                 |
-                |class SplashScreenImpl : AdventOfCode.SplashScreen
+                |class SplashScreenImpl : SplashScreen
                 |{{
-                |
                 |    public override void Show()
                 |    {{
-                |        var color = Console.ForegroundColor;
-                |            {calendarPrinter.Indent(12)}
-                |            Console.ForegroundColor = color;
-                |            Console.WriteLine();
+                |        {calendarPrinter.Indent(8)}
+                |        Console.WriteLine();
                 |    }}
                 |}}".StripMargin();
         }
@@ -33,7 +28,7 @@ namespace AdventOfCode.Generator
                 [new[] { "title" }] = 0xffff66,
                 [new[] { "calendar-star" }] = 0xffff66,
                 [new[] { "calendar-complete", "calendar-mark-complete" }] = 0xffff66,
-                [new[] { "calendar-verycomplete", "calendar-mark-complete" }] = 0xfff66,
+                [new[] { "calendar-verycomplete", "calendar-mark-complete" }] = 0xffff66,
                 [new[] { "calendar-verycomplete", "calendar-mark-verycomplete" }] = 0xffff66,
 
                 [new[] { "calendar-edge" }] = 0xcccccc,
@@ -81,7 +76,7 @@ namespace AdventOfCode.Generator
                 [new[] { "calendar-color-t" }] = 0xcccccc,
                 [new[] { "calendar-color-i" }] = 0xff0000,
                 [new[] { "calendar-color-y" }] = 0xffff66,
-                [new[] { "calendar-color-w1" }] = 0x00ffff,
+                [new[] { "calendar-color-w1" }] = 0x00c8ff,
             };
 
             var lines = calendar.Lines.Select(line =>
@@ -135,7 +130,7 @@ namespace AdventOfCode.Generator
                     var block = buffer.Substring(0, Math.Min(100, buffer.Length));
                     buffer = buffer.Substring(block.Length);
                     block = block.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "\\r").Replace("\n", "\\n");
-                    sb.AppendLine($@"Write(0x{bufferColor.ToString("x")}, ""{block}"");");
+                    sb.AppendLine($@"Write(0x{bufferColor:x6}, ""{block}"");");
                 }
                 buffer = "";
             }
