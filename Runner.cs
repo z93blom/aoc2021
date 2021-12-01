@@ -27,12 +27,19 @@ public class Runner
             {
                 WriteLine(ConsoleColor.White, $"{solver.DayName()}: {solver.GetName()}");
                 WriteLine();
-                foreach (var dir in new[] { workingDir, Path.Combine(workingDir, "test"), Path.Combine(@"..\..\..\..\..", workingDir) })
+                foreach (var dir in new[]
+                { 
+                    workingDir,
+                    Path.Combine(workingDir, "test"), 
+                    Path.Combine(@"..\..\..", workingDir), 
+                    Path.Combine(@"..\..\..", workingDir, "test")
+                })
                 {
                     if (!Directory.Exists(dir))
                     {
                         continue;
                     }
+
                     var files = Directory.EnumerateFiles(dir).Where(file => file.EndsWith(".in")).ToArray();
                     foreach (var file in files)
                     {

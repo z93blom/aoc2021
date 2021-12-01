@@ -21,7 +21,7 @@ namespace AdventOfCode.Utilities
             return matches.Cast<Match>().SelectMany(m => m.Captures.Cast<Capture>().Select(v => int.Parse(v.Value)));
         }
 
-                public static IEnumerable<int> ParseNumbers(this string t)
+        public static IEnumerable<int> ParseNumbers(this string t)
         {
             var position = 0;
             while (position < t.Length)
