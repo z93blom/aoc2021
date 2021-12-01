@@ -16,7 +16,7 @@ class SplashScreenImpl : AdventOfCode.SplashScreen
             Write(0x888888, "                      ~   ~  ~ ~~ ~~~~~~~~~~~~~~~   1 ");
             Write(0xfff66, "*");
             Write(0xffff66, "*\n           ");
-            Write(0x888888, "                                      . .  ..''''   2\n                                              ");
+            Write(0x888888, "                                           ..''''   2\n                                              ");
             Write(0x888888, "                 3\n                                                               4\n                ");
             Write(0x888888, "                                               5\n                                                   ");
             Write(0x888888, "            6\n                                                               7\n                     ");

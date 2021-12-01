@@ -1,6 +1,6 @@
-namespace AdventOfCode.Y2021.Day01;
-
 using AdventOfCode.Utilities;
+
+namespace AdventOfCode.Y2021.Day01;
 
 class Solution : ISolver
 {
