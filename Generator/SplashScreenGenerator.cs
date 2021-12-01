@@ -80,9 +80,8 @@ namespace AdventOfCode.Generator
                 [new[] { "calendar-color-w" }] = 0xcccccc,
                 [new[] { "calendar-color-t" }] = 0xcccccc,
                 [new[] { "calendar-color-i" }] = 0xff0000,
-                [new[] { "calendar-color-y" }] = 0xffff66, 
-
-
+                [new[] { "calendar-color-y" }] = 0xffff66,
+                [new[] { "calendar-color-w1" }] = 0x00ffff,
             };
 
             var lines = calendar.Lines.Select(line =>
