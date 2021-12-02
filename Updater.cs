@@ -36,8 +36,9 @@ public class Updater
             Directory.CreateDirectory(dir);
         }
 
-        var years = solvers.Select(tsolver => SolverExtensions.Year(tsolver));
+        var years = solvers.Select(s => SolverExtensions.Year(s));
 
+        CreateThemeForYear(calendar);
         UpdateReadmeForYear(calendar);
         UpdateSplashScreen(calendar);
         UpdateReadmeForDay(problem);
@@ -89,6 +90,14 @@ public class Updater
             WriteFile(file, SolutionTemplateGenerator.Generate(problem));
         }
     }
+    static void CreateThemeForYear(Calendar calendar)
+    {
+        var file = Path.Combine(SolverExtensions.WorkingDir(calendar.Year), "Theme.cs");
+        if (!File.Exists(file))
+        {
+            WriteFile(file, ThemeGenerator.Generate(calendar));
+        }
+    }
 
     static void UpdateReadmeForYear(Calendar calendar)
     {
@@ -98,8 +107,15 @@ public class Updater
 
     static void UpdateSplashScreen(Calendar calendar)
     {
+        var themeColors = Theme.GetDefaultTheme();
+        var theme = SolverExtensions.Theme(calendar.Year);
+        if (theme != null)
+        {
+            theme.Override(themeColors);
+        }
+
         var file = Path.Combine(SolverExtensions.WorkingDir(calendar.Year), "SplashScreen.cs");
-        WriteFile(file, new SplashScreenGenerator().Generate(calendar));
+        WriteFile(file, new SplashScreenGenerator().Generate(calendar, themeColors));
     }
 
     static void UpdateInput(Problem problem)

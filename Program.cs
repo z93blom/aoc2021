@@ -16,7 +16,7 @@ class Program
             typeof(Program).Assembly
         };
 
-        var tsolvers = assemblies.SelectMany(a => a.GetTypes())
+        var solverTypes = assemblies.SelectMany(a => a.GetTypes())
             .Where(t => t.GetTypeInfo().IsClass && typeof(ISolver).IsAssignableFrom(t))
             .OrderBy(t => t.FullName)
             .ToArray();
@@ -26,14 +26,14 @@ class Program
             {
                 var year = int.Parse(m[1]);
                 var day = int.Parse(m[2]);
-                return () => Updater.Update(year, day, tsolvers, usageProvider).Wait();
+                return () => Updater.Update(year, day, solverTypes, usageProvider).Wait();
             }) ??
             Command(args, Args("update", "last"), m =>
             {
                 var dt = DateTime.Now;
                 if (dt.Month == 12 && dt.Day >= 1 && dt.Day <= 25)
                 {
-                    return () => Updater.Update(dt.Year, dt.Day, tsolvers, usageProvider).Wait();
+                    return () => Updater.Update(dt.Year, dt.Day, solverTypes, usageProvider).Wait();
                 }
                 else
                 {
@@ -44,7 +44,7 @@ class Program
              {
                  var year = int.Parse(m[0]);
                  var day = int.Parse(m[1]);
-                 var tsolversSelected = tsolvers.First(tsolver =>
+                 var tsolversSelected = solverTypes.First(tsolver =>
                                  SolverExtensions.Year(tsolver) == year &&
                                  SolverExtensions.Day(tsolver) == day);
                  return () => Runner.RunAll(tsolversSelected);
@@ -52,31 +52,31 @@ class Program
              Command(args, Args("[0-9]+"), m =>
              {
                  var year = int.Parse(m[0]);
-                 var tsolversSelected = tsolvers.Where(tsolver =>
+                 var tsolversSelected = solverTypes.Where(tsolver =>
                                  SolverExtensions.Year(tsolver) == year);
                  return () => Runner.RunAll(tsolversSelected.ToArray());
              }) ??
             Command(args, Args("([0-9]+)[/-]last"), m =>
             {
                 var year = int.Parse(m[0]);
-                var tsolversSelected = tsolvers.Last(tsolver =>
+                var tsolversSelected = solverTypes.Last(tsolver =>
                     SolverExtensions.Year(tsolver) == year);
                 return () => Runner.RunAll(tsolversSelected);
             }) ??
             Command(args, Args("([0-9]+)[/-]all"), m =>
             {
                 var year = int.Parse(m[0]);
-                var tsolversSelected = tsolvers.Where(tsolver =>
+                var tsolversSelected = solverTypes.Where(tsolver =>
                     SolverExtensions.Year(tsolver) == year);
                 return () => Runner.RunAll(tsolversSelected.ToArray());
             }) ??
             Command(args, Args("all"), m =>
             {
-                return () => Runner.RunAll(tsolvers);
+                return () => Runner.RunAll(solverTypes);
             }) ??
             Command(args, Args("last"), m =>
             {
-                var tsolversSelected = tsolvers.Last();
+                var tsolversSelected = solverTypes.Last();
                 return () => Runner.RunAll(tsolversSelected);
             }) ??
             new Action(() =>
