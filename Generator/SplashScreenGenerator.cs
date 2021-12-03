@@ -4,7 +4,7 @@ using AdventOfCode.Model;
 namespace AdventOfCode.Generator;
 
 public class SplashScreenGenerator {
-    public string Generate(Calendar calendar, Dictionary<string, int> themeColors) {
+    public static string Generate(Calendar calendar, Dictionary<string, int> themeColors) {
         string calendarPrinter = CalendarPrinter(calendar, themeColors);
         return $@"
             |namespace AdventOfCode.Y{calendar.Year};
@@ -39,13 +39,10 @@ public class SplashScreenGenerator {
             foreach (var token in line)
             {
                 var consoleColor = 0x888888;
-                foreach (var s in token.Styles)
+                if (!string.IsNullOrWhiteSpace(token.Text))
                 {
-                    if (themeColors.ContainsKey(s))
-                    {
-                        consoleColor = themeColors[s];
-                        break;
-                    }
+                    var style = token.Styles.FirstOrDefault(s => themeColors.ContainsKey(s));
+                    consoleColor = style == default ? 0x888888 : themeColors[style];
                 }
 
                 bw.Write(consoleColor, token.Text);

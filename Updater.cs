@@ -115,7 +115,7 @@ public class Updater
         }
 
         var file = Path.Combine(SolverExtensions.WorkingDir(calendar.Year), "SplashScreen.cs");
-        WriteFile(file, new SplashScreenGenerator().Generate(calendar, themeColors));
+        WriteFile(file, SplashScreenGenerator.Generate(calendar, themeColors));
     }
 
     static void UpdateInput(Problem problem)
