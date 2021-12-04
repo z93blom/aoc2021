@@ -10,7 +10,7 @@ public class Updater
 
     public static async Task Update(int year, int day, IEnumerable<Type> solvers, IUsageProvider usageProvider)
     {
-        if (!System.Environment.GetEnvironmentVariables().Contains(SessionEnvironmentName))
+        if (!Environment.GetEnvironmentVariables().Contains(SessionEnvironmentName))
         {
             throw new Exception($"Specify '{SessionEnvironmentName}' environment variable.");
         }
@@ -61,7 +61,7 @@ public class Updater
         File.WriteAllText(file, content);
     }
 
-    static string Dir(int year, int day) => SolverExtensions.WorkingDir(year, day);
+    static string Dir(int year, int day) => Path.Combine(SolverExtensions.WorkingDir(year, day));
 
     static async Task<Calendar> DownloadCalendar(HttpClient client, int year)
     {
@@ -78,13 +78,13 @@ public class Updater
 
     static void UpdateReadmeForDay(Problem problem)
     {
-        var file = Path.Combine(Dir(problem.Year, problem.Day), "README.md");
+        var file = Path.Combine(Environment.CurrentDirectory, Dir(problem.Year, problem.Day), "README.md");
         WriteFile(file, problem.ContentMd);
     }
 
     static void UpdateSolutionTemplate(Problem problem)
     {
-        var file = Path.Combine(Dir(problem.Year, problem.Day), "Solution.cs");
+        var file = Path.Combine(Environment.CurrentDirectory, Dir(problem.Year, problem.Day), "Solution.cs");
         if (!File.Exists(file))
         {
             WriteFile(file, SolutionTemplateGenerator.Generate(problem));
@@ -92,7 +92,7 @@ public class Updater
     }
     static void CreateThemeForYear(Calendar calendar)
     {
-        var file = Path.Combine(SolverExtensions.WorkingDir(calendar.Year), "Theme.cs");
+        var file = Path.Combine(Environment.CurrentDirectory, SolverExtensions.WorkingDir(calendar.Year), "Theme.cs");
         if (!File.Exists(file))
         {
             WriteFile(file, ThemeGenerator.Generate(calendar));
@@ -101,7 +101,7 @@ public class Updater
 
     static void UpdateReadmeForYear(Calendar calendar)
     {
-        var file = Path.Combine(SolverExtensions.WorkingDir(calendar.Year), "README.md");
+        var file = Path.Combine(Environment.CurrentDirectory, SolverExtensions.WorkingDir(calendar.Year), "README.md");
         WriteFile(file, ReadmeGeneratorForYear.Generate(calendar));
     }
 
@@ -114,19 +114,19 @@ public class Updater
             theme.Override(themeColors);
         }
 
-        var file = Path.Combine(SolverExtensions.WorkingDir(calendar.Year), "SplashScreen.cs");
+        var file = Path.Combine(Environment.CurrentDirectory, SolverExtensions.WorkingDir(calendar.Year), "SplashScreen.cs");
         WriteFile(file, SplashScreenGenerator.Generate(calendar, themeColors));
     }
 
     static void UpdateInput(Problem problem)
     {
-        var file = Path.Combine(Dir(problem.Year, problem.Day), "input.in");
+        var file = Path.Combine(Environment.CurrentDirectory, Dir(problem.Year, problem.Day), "input.in");
         WriteFile(file, problem.Input);
     }
 
     static void UpdateRefout(Problem problem)
     {
-        var file = Path.Combine(Dir(problem.Year, problem.Day), "input.refout");
+        var file = Path.Combine(Environment.CurrentDirectory, Dir(problem.Year, problem.Day), "input.refout");
         if (problem.Answers.Any())
         {
             WriteFile(file, problem.Answers);

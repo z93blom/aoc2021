@@ -2,7 +2,8 @@
   "profiles": {
     "aoc2021": {
       "commandName": "Project",
-      "commandLineArgs": "last"
+      "commandLineArgs": "last",
+      "workingDirectory": "$(SolutionDirectory)"
     }
   }
 }

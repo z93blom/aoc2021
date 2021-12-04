@@ -22,17 +22,18 @@ public class Runner
             }
 
             var workingDir = solver.WorkingDir();
+            var currentDirectory = Environment.CurrentDirectory;
             var color = Console.ForegroundColor;
             try
             {
                 WriteLine(ConsoleColor.White, $"{solver.DayName()}: {solver.GetName()}");
                 WriteLine();
                 foreach (var dir in new[]
-                { 
-                    workingDir,
-                    Path.Combine(workingDir, "test"), 
-                    Path.Combine(@"..\..\..", workingDir), 
-                    Path.Combine(@"..\..\..", workingDir, "test")
+                {
+                    Path.Combine(currentDirectory, workingDir, "test"),
+                    Path.Combine(currentDirectory, @"..\..\..", workingDir, "test"),
+                    Path.Combine(currentDirectory, workingDir),
+                    Path.Combine(currentDirectory, @"..\..\..", workingDir), 
                 })
                 {
                     if (!Directory.Exists(dir))
@@ -43,7 +44,6 @@ public class Runner
                     var files = Directory.EnumerateFiles(dir).Where(file => file.EndsWith(".in")).ToArray();
                     foreach (var file in files)
                     {
-
                         if (files.Length > 1)
                         {
                             WriteLine(color, "  " + file + ":");
