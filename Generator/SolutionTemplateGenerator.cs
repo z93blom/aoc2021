@@ -22,7 +22,7 @@ namespace AdventOfCode.Generator
                 |    {{
                 |        yield return PartOne(input);
                 |        yield return PartTwo(input);
-                |     }}
+                |    }}
                 |
                 |    object PartOne(string input)
                 |    {{
