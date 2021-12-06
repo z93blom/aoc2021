@@ -55,7 +55,7 @@ public class SplashScreenGenerator {
     }
 
     class BufferWriter {
-        StringBuilder sb = new StringBuilder();
+        readonly StringBuilder sb = new();
         int bufferColor = -1;
         string buffer = "";
 
@@ -71,8 +71,8 @@ public class SplashScreenGenerator {
 
         private void Flush() {
             while (buffer.Length > 0) {
-                var block = buffer.Substring(0, Math.Min(100, buffer.Length));
-                buffer = buffer.Substring(block.Length);
+                var block = buffer[..Math.Min(100, buffer.Length)];
+                buffer = buffer[block.Length..];
                 block = block.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "\\r").Replace("\n", "\\n");
                 sb.AppendLine($@"Write(0x{bufferColor:x6}, ""{block}"");");
             }

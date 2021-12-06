@@ -77,8 +77,19 @@ namespace AdventOfCode.Utilities
         public static bool Matches(this string s, string pattern, out Group[] groups)
         {
             var match = Regex.Match(s, pattern);
-            groups = match.Groups.Cast<Group>().ToArray();
+            groups = match.Groups.Cast<Group>().Skip(1).ToArray();
             return match.Success;
+        }
+
+        public static IEnumerable<Group[]> Matches(this IEnumerable<string> strings, string pattern)
+        {
+            foreach(var s in strings)
+            {
+                if (s.Matches(pattern, out var groups))
+                {
+                    yield return groups;
+                }
+            }
         }
     }
 }
