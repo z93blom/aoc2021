@@ -86,7 +86,7 @@ public class Runner
                     }
                     else if (elapsed > 500)
                     {
-                        parts[3] = $"[orange]{elapsed}[/]";
+                        parts[3] = $"[darkorange3_1]{elapsed}[/]";
                     }
                     else
                     {
@@ -94,7 +94,7 @@ public class Runner
                     }
 
                     table.AddRow(parts);
-                    stopWatch.Reset();
+                    stopWatch.Restart();
                     iline++;
                 }
 
