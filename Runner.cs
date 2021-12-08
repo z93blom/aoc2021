@@ -48,7 +48,7 @@ public class Runner
             table.AddColumn("File");
             table.AddColumn("Status");
             table.AddColumn("Value");
-            table.AddColumn("Time", tc => tc.Alignment(Justify.Right));
+            table.AddColumn("Time (ms)", tc => tc.Alignment(Justify.Right));
             table.AddColumn("Error");
             var stopWatch = new Stopwatch();
             foreach (var file in allFiles)
@@ -60,7 +60,7 @@ public class Runner
                 stopWatch.Start();
                 foreach (var line in solver.Solve(input))
                 {
-                    var elapsed = stopWatch.ElapsedMilliseconds;
+                    var elapsed = stopWatch.Elapsed;
                     var parts = new string[5];
                     parts[0] = file[commonPrefix.Length..];
                     parts[4] = "";
@@ -80,17 +80,18 @@ public class Runner
 
                     parts[2] = line.ToString();
 
-                    if (elapsed > 1000)
+                    var milliseconds = elapsed.Ticks / (double)TimeSpan.TicksPerMillisecond;
+                    if (elapsed > TimeSpan.FromMilliseconds(1000))
                     {
-                        parts[3] = $"[red]{elapsed}[/]";
+                        parts[3] = $"[red]{milliseconds:0.###}[/]";
                     }
-                    else if (elapsed > 500)
+                    else if (elapsed > TimeSpan.FromMilliseconds(500))
                     {
-                        parts[3] = $"[darkorange3_1]{elapsed}[/]";
+                        parts[3] = $"[darkorange3_1]{milliseconds:0.###}[/]";
                     }
                     else
                     {
-                        parts[3] = $"[darkgreen]{elapsed}[/]";
+                        parts[3] = $"[darkgreen]{milliseconds:0.###}[/]";
                     }
 
                     table.AddRow(parts);
