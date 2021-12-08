@@ -24,12 +24,12 @@ namespace AdventOfCode.Generator
                 |        yield return PartTwo(input);
                 |    }}
                 |
-                |    object PartOne(string input)
+                |    static object PartOne(string input)
                 |    {{
                 |        return 0;
                 |    }}
                 |
-                |    object PartTwo(string input)
+                |    static object PartTwo(string input)
                 |    {{
                 |        return 0;
                 |    }}
