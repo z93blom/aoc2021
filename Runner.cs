@@ -46,10 +46,15 @@ public class Runner
 
             var table = new Table();
             table.AddColumn("File");
-            table.AddColumn("Status");
+            table.AddColumn("Part");
             table.AddColumn("Value");
             table.AddColumn("Time (ms)", tc => tc.Alignment(Justify.Right));
             table.AddColumn("Error");
+            var fileIndex = 0;
+            var partIndex = 1;
+            var valueIndex = 2;
+            var timeIndex = 3;
+            var errorIndex = 4;
             var stopWatch = new Stopwatch();
             foreach (var file in allFiles)
             {
@@ -58,40 +63,50 @@ public class Runner
                 var input = File.ReadAllText(file).TrimEnd();
                 var iline = 0;
                 stopWatch.Start();
+                var partNumber = 1;
                 foreach (var line in solver.Solve(input))
                 {
                     var elapsed = stopWatch.Elapsed;
                     var parts = new string[5];
-                    parts[0] = file[commonPrefix.Length..];
-                    parts[4] = "";
-                    if (refout == null || refout.Length <= iline)
+                    if (partNumber == 1)
                     {
-                        parts[1] = "[cyan]?[/]";
-                    }
-                    else if (refout[iline] == line.ToString())
-                    {
-                        parts[1] = "[darkgreen]✓[/]";
+                        parts[fileIndex] = file[commonPrefix.Length..];
                     }
                     else
                     {
-                        parts[1] = "[red]X[/]";
-                        parts[4] = $"{solver.DayName()}: In line {iline + 1} expected '{refout[iline]}' but found '{line}'";
+                        parts[fileIndex] = string.Empty;
                     }
 
-                    parts[2] = line.ToString();
+                    if (refout == null || refout.Length <= iline)
+                    {
+                        parts[partIndex] = $"{partNumber++} [cyan]?[/]";
+                        parts[errorIndex] = "";
+                    }
+                    else if (refout[iline] == line.ToString())
+                    {
+                        parts[partIndex] = $"{partNumber++} [darkgreen]✓[/]";
+                        parts[errorIndex] = "";
+                    }
+                    else
+                    {
+                        parts[partIndex] = $"{partNumber++} [red]X[/]";
+                        parts[errorIndex] = $"{solver.DayName()}: In line {iline + 1} expected '{refout[iline]}' but found '{line}'";
+                    }
+
+                    parts[valueIndex] = line.ToString();
 
                     var milliseconds = elapsed.Ticks / (double)TimeSpan.TicksPerMillisecond;
                     if (elapsed > TimeSpan.FromMilliseconds(1000))
                     {
-                        parts[3] = $"[red]{milliseconds:0.###}[/]";
+                        parts[timeIndex] = $"[red]{milliseconds:0.###}[/]";
                     }
                     else if (elapsed > TimeSpan.FromMilliseconds(500))
                     {
-                        parts[3] = $"[darkorange3_1]{milliseconds:0.###}[/]";
+                        parts[timeIndex] = $"[darkorange3_1]{milliseconds:0.###}[/]";
                     }
                     else
                     {
-                        parts[3] = $"[darkgreen]{milliseconds:0.###}[/]";
+                        parts[timeIndex] = $"[darkgreen]{milliseconds:0.###}[/]";
                     }
 
                     table.AddRow(parts);
