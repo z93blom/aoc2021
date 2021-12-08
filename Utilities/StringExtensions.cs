@@ -91,5 +91,48 @@ namespace AdventOfCode.Utilities
                 }
             }
         }
+
+        /// <summary>
+        /// Removes all occurances of a character from a string.
+        /// </summary>
+        /// <param name="s">The string being changed.</param>
+        /// <param name="c">The character to be removed.</param>
+        /// <returns>The resulting string.</returns>
+        public static string RemoveChar(this string s, char c)
+        {
+            return s.Replace(new string(c, 1), string.Empty);
+        }
+
+        /// <summary>
+        /// Removes all occurances of the characters from a string.
+        /// </summary>
+        /// <param name="s">The string being changed.</param>
+        /// <param name="characters">The characters to be removed from the string.</param>
+        /// <returns>The resulting string.</returns>
+        public static string RemoveAll(this string s, char[] characters)
+        {
+            foreach(var c in characters)
+            {
+                s = s.RemoveChar(c);
+            }
+
+            return s;
+        }
+
+        /// <summary>
+        /// Removes all characters from a string.
+        /// </summary>
+        /// <param name="s">The string being changed.</param>
+        /// <param name="c">A string containing all the characters to be removed..</param>
+        /// <returns>The resulting string.</returns>
+        public static string RemoveAllChars(this string s, string remove)
+        {
+            foreach (var c in remove)
+            {
+                s = s.RemoveChar(c);
+            }
+
+            return s;
+        }
     }
 }
