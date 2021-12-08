@@ -24,7 +24,6 @@ public class Runner
 
             var workingDir = solver.WorkingDir();
             var currentDirectory = Environment.CurrentDirectory;
-            AnsiConsole.MarkupLine($"[white]{solver.DayName()}: {solver.GetName()}[/]");
             var directories = new[]
             {
                 Path.Combine(currentDirectory, workingDir, "test"),
@@ -44,20 +43,22 @@ public class Runner
 
             var commonPrefix = GetLongestCommonPrefix(allFiles);
 
-            var table = new Table();
-            table.AddColumn("File");
-            table.AddColumn("Part");
-            table.AddColumn("Value");
-            table.AddColumn("Time (ms)", tc => tc.Alignment(Justify.Right));
-            table.AddColumn("Error");
-            var fileIndex = 0;
-            var partIndex = 1;
-            var valueIndex = 2;
-            var timeIndex = 3;
-            var errorIndex = 4;
+            var root = new Tree($"[white]{solver.DayName()}: {solver.GetName()}[/]");
+
             var stopWatch = new Stopwatch();
             foreach (var file in allFiles)
             {
+                var fileNode = root.AddNode(file[commonPrefix.Length..]);
+                var table = new Table();
+                table.AddColumn("Part");
+                table.AddColumn("Value");
+                table.AddColumn("Time (ms)", tc => tc.Alignment(Justify.Right));
+                table.AddColumn("Error");
+                var partIndex = 0;
+                var valueIndex = 1;
+                var timeIndex = 2;
+                var errorIndex = 3;
+
                 var refoutFile = file.Replace(".in", ".refout");
                 var refout = File.Exists(refoutFile) ? File.ReadAllLines(refoutFile) : null;
                 var input = File.ReadAllText(file).TrimEnd();
@@ -67,15 +68,7 @@ public class Runner
                 foreach (var line in solver.Solve(input))
                 {
                     var elapsed = stopWatch.Elapsed;
-                    var parts = new string[5];
-                    if (partNumber == 1)
-                    {
-                        parts[fileIndex] = file[commonPrefix.Length..];
-                    }
-                    else
-                    {
-                        parts[fileIndex] = string.Empty;
-                    }
+                    var parts = new string[4];
 
                     if (refout == null || refout.Length <= iline)
                     {
@@ -114,9 +107,10 @@ public class Runner
                     iline++;
                 }
 
+                fileNode.AddNode(table);
             }
 
-            AnsiConsole.Write(table);
+            AnsiConsole.Write(root);
             AnsiConsole.WriteLine();
         }
     }
