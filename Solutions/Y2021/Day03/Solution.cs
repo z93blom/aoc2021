@@ -16,7 +16,7 @@ class Solution : ISolver
         yield return PartTwo(input);
      }
 
-    object PartOne(string input)
+    static object PartOne(string input)
     {
         var lines = input.Lines().ToArray();
         var mostCommon = "";
@@ -42,7 +42,7 @@ class Solution : ISolver
         return gamma*epsilon;
     }
 
-    object PartTwo(string input)
+    static object PartTwo(string input)
     {
         var lines = input.Lines().ToArray();
         var index = 0;

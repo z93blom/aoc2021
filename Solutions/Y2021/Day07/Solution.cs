@@ -16,7 +16,7 @@ class Solution : ISolver
         yield return PartTwo(input);
     }
 
-    object PartOne(string input)
+    static object PartOne(string input)
     {
         var positions = input.Integers().ToArray();
         var min = positions.Min();
@@ -36,7 +36,7 @@ class Solution : ISolver
         return bestValue;
     }
 
-    object PartTwo(string input)
+    static object PartTwo(string input)
     {
         var positions = input.Integers().ToArray();
         var min = positions.Min();
@@ -57,11 +57,13 @@ class Solution : ISolver
         return bestValue;
     }
 
-    private List<int> GetCosts(int min, int max)
+    private static List<int> GetCosts(int min, int max)
     {
-        var costs = new List<int>(max - min);
-        costs.Add(0);
-        for(var i = 1; i <= max - min; i++)
+        var costs = new List<int>(max - min)
+        {
+            0
+        };
+        for (var i = 1; i <= max - min; i++)
         {
             costs.Add(costs[i - 1] + i);
         }

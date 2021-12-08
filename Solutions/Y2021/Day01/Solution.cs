@@ -16,7 +16,7 @@ class Solution : ISolver
         yield return PartTwo(input);
      }
 
-    object PartOne(string input)
+    static object PartOne(string input)
     {
         var measurements = input.Integers().ToArray();
         var increasedValues = Enumerable.Range(1, measurements.Length - 1)
@@ -24,7 +24,7 @@ class Solution : ISolver
         return increasedValues;
     }
 
-    object PartTwo(string input)
+    static object PartTwo(string input)
     {
         var measurements = input.Integers().ToArray();
         var windows = Enumerable.Range(0, measurements.Length - 2)

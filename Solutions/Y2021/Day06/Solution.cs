@@ -17,7 +17,7 @@ class Solution : ISolver
         yield return PartTwo(input);
     }
 
-    object PartOne(string input)
+    static object PartOne(string input)
     {
         return Simulate(input, 80);
     }
@@ -58,7 +58,7 @@ class Solution : ISolver
         return groups.Select(g => g.Value).Sum() + countdowns.Select(v => v).Sum();
     }
 
-    object PartTwo(string input)
+    static object PartTwo(string input)
     {
         return Simulate(input, 256);
 

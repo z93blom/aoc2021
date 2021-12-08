@@ -86,7 +86,7 @@ public class Runner
                         parts[errorIndex] = $"{solver.DayName()}: In line {iline + 1} expected '{refout[iline]}' but found '{line}'";
                     }
 
-                    parts[valueIndex] = line.ToString();
+                    parts[valueIndex] = $"{line}";
 
                     var milliseconds = elapsed.Ticks / (double)TimeSpan.TicksPerMillisecond;
                     if (elapsed > TimeSpan.FromMilliseconds(1000))
@@ -128,7 +128,7 @@ public class Runner
                     break;
                 }
         }
-        return s[0].Substring(0, k);
+        return s[0][..k];
     }
 
     private static void WriteLine(ConsoleColor color = ConsoleColor.Gray, string text = "")

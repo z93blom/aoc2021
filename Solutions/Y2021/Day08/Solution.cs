@@ -16,7 +16,7 @@ class Solution : ISolver
         yield return PartTwo(input);
     }
 
-    object PartOne(string input)
+    static object PartOne(string input)
     {
         var inOut = input.Lines()
             .Select(l => l.Split('|').ToArray())
@@ -30,7 +30,7 @@ class Solution : ISolver
         return lengths.Select(v => v.Count(t => uniqueLengths.Contains(t))).Sum();
     }
 
-    object PartTwo(string input)
+    static object PartTwo(string input)
     {
         var inOut = input.Lines()
             .Select(l => l.Split('|').ToArray())
@@ -47,33 +47,33 @@ class Solution : ISolver
         return values.Sum();
     }
 
-    public int CalculateValue(string[] signals, string[] numbers)
+    public static int CalculateValue(string[] signals, string[] numbers)
     {
         var map = MapWireToSegment(signals);
         var v = numbers.Aggregate(0, (agg, t) => agg * 10 + MapToNumber(t, map));
         return v;
     }
 
-    public int MapToNumber(string s, Dictionary<char, char> map)
+    public static int MapToNumber(string s, Dictionary<char, char> map)
     {
         var v = new string(s.Select(c => map[c]).OrderBy(c => c).ToArray());
-        switch(v)
+        return v switch
         {
-            case "abcefg": return 0;
-            case "cf": return 1;
-            case "acdeg": return 2;
-            case "acdfg": return 3;
-            case "bcdf": return 4;
-            case "abdfg": return 5;
-            case "abdefg": return 6;
-            case "acf": return 7;
-            case "abcdefg": return 8;
-            case "abcdfg": return 9;
-            default: throw new Exception($"Invalid number : {v}");
-        }
+            "abcefg" => 0,
+            "cf" => 1,
+            "acdeg" => 2,
+            "acdfg" => 3,
+            "bcdf" => 4,
+            "abdfg" => 5,
+            "abdefg" => 6,
+            "acf" => 7,
+            "abcdefg" => 8,
+            "abcdfg" => 9,
+            _ => throw new Exception($"Invalid number : {v}"),
+        };
     }
 
-    public Dictionary<char, char> MapWireToSegment(string[] signals)
+    public static Dictionary<char, char> MapWireToSegment(string[] signals)
     {
         var map = new Dictionary<char, char>();
 
@@ -89,8 +89,6 @@ class Solution : ISolver
         var six = unknownSignals.Where(x => x.RemoveAllChars(seven).Length == 4).Single(); unknownSignals.Remove(six);
 
         var a = seven.Where(c => !one.Contains(c)).Single();
-
-        var rightSegments = one;
 
         // c is the only segment lit in three that isn't lit it six.
         var c = three.Where(c => !six.Contains(c)).Single();
