@@ -30,21 +30,20 @@ class Solution : ISolver
 
     public static int ToInt(char c)
     {
-        switch(c)
+        return c switch
         {
-            case '0': return 0;
-            case '1': return 1;
-            case '2': return 2;
-            case '3': return 3;
-            case '4': return 4;
-            case '5': return 5;
-            case '6': return 6;
-            case '7': return 7;
-            case '8': return 8;
-            case '9': return 9;
-        }
-
-        return -1;
+            '0' => 0,
+            '1' => 1,
+            '2' => 2,
+            '3' => 3,
+            '4' => 4,
+            '5' => 5,
+            '6' => 6,
+            '7' => 7,
+            '8' => 8,
+            '9' => 9,
+            _ => -1,
+        };
     }
 
     static object PartTwo(string input)
@@ -90,9 +89,9 @@ class Solution : ISolver
 
     private class Grid
     {
-        private int[,] _grid;
-        private int _width;
-        private int _height;
+        private readonly int[,] _grid;
+        private readonly int _width;
+        private readonly int _height;
 
         public Grid(string input)
         {
