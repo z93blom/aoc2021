@@ -52,7 +52,8 @@ public class Runner
             var stopWatch = new Stopwatch();
             foreach (var file in allFiles)
             {
-                var fileNode = root.AddNode(file[commonPrefix.Length..]);
+                var filePresentation = file.Substring(commonPrefix.Length, file.Length - commonPrefix.Length - Path.GetExtension(file).Length);
+                var fileNode = root.AddNode(filePresentation);
                 var table = new Table()
                     .Border(TableBorder.Horizontal)
                     .BorderColor(Color.Grey35);
