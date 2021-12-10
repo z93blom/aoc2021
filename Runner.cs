@@ -1,5 +1,6 @@
 using Spectre.Console;
 using System.Diagnostics;
+using System.Text;
 
 namespace AdventOfCode;
 
@@ -42,14 +43,19 @@ public class Runner
             }).ToArray();
 
             var commonPrefix = GetLongestCommonPrefix(allFiles);
-
-            var root = new Tree($"[white]{solver.DayName()}: {solver.GetName()}[/]");
+            var root = new Tree($"[white]{solver.DayName()}: {solver.GetName()}[/]")
+            {
+                Style = new Style()
+                    .Foreground(Color.Grey35)
+            };
 
             var stopWatch = new Stopwatch();
             foreach (var file in allFiles)
             {
                 var fileNode = root.AddNode(file[commonPrefix.Length..]);
-                var table = new Table();
+                var table = new Table()
+                    .Border(TableBorder.Horizontal)
+                    .BorderColor(Color.Grey35);
                 table.AddColumn("Part");
                 table.AddColumn("Value");
                 table.AddColumn("Time (ms)", tc => tc.Alignment(Justify.Right));
@@ -129,16 +135,5 @@ public class Runner
                 }
         }
         return s[0][..k];
-    }
-
-    private static void WriteLine(ConsoleColor color = ConsoleColor.Gray, string text = "")
-    {
-        Write(color, text + "\n");
-    }
-    private static void Write(ConsoleColor color = ConsoleColor.Gray, string text = "")
-    {
-        Console.ForegroundColor = color;
-        Console.Write(text);
-        Console.ResetColor();
     }
 }

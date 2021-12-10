@@ -45,6 +45,7 @@ public class Updater
         UpdateInput(problem);
         UpdateRefout(problem);
         UpdateSolutionTemplate(problem);
+        UpdateExample(problem);
     }
 
     static async Task<string> Download(HttpClient client, string path)
@@ -90,6 +91,22 @@ public class Updater
             WriteFile(file, SolutionTemplateGenerator.Generate(problem));
         }
     }
+
+    static void UpdateExample(Problem problem)
+    {
+        var inputFile = Path.Combine(Environment.CurrentDirectory, Dir(problem.Year, problem.Day), "test", "example.in");
+        if (!File.Exists(inputFile))
+        {
+            WriteFile(inputFile, string.Empty);
+        }
+
+        var answerFile = Path.Combine(Environment.CurrentDirectory, Dir(problem.Year, problem.Day), "test", "example.refout");
+        if (!File.Exists(answerFile))
+        {
+            WriteFile(answerFile, string.Empty);
+        }
+    }
+
     static void CreateThemeForYear(Calendar calendar)
     {
         var file = Path.Combine(Environment.CurrentDirectory, SolverExtensions.WorkingDir(calendar.Year), "Theme.cs");

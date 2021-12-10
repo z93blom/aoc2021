@@ -13,6 +13,7 @@ public class SplashScreenGenerator {
             |{{
             |    public override void Show()
             |    {{
+            |        WriteFiglet(""Advent of code {calendar.Year}"", Spectre.Console.Color.Yellow);
             |        {calendarPrinter.Indent(8)}
             |        Console.WriteLine();
             |    }}
@@ -22,17 +23,6 @@ public class SplashScreenGenerator {
     private static string CalendarPrinter(Calendar calendar, Dictionary<string, int> themeColors) {
         var lines = calendar.Lines.Select(line =>
             new[] { new CalendarToken { Text = "           " } }.Concat(line)).ToList();
-        lines.Insert(0, new[]{new CalendarToken {
-            Styles = new []{"title"},
-            Text = $@"
-                |  __   ____  _  _  ____  __ _  ____     __  ____     ___  __  ____  ____         
-                | / _\ (    \/ )( \(  __)(  ( \(_  _)   /  \(  __)   / __)/  \(    \(  __)        
-                |/    \ ) D (\ \/ / ) _) /    /  )(    (  O )) _)   ( (__(  O )) D ( ) _)         
-                |\_/\_/(____/ \__/ (____)\_)__) (__)    \__/(__)     \___)\__/(____/(____)  {calendar.Year}
-                |"
-            .StripMargin()
-        }});
-
         var bw = new BufferWriter();
         foreach (var line in lines)
         {
