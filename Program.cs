@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.Loader;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode;
@@ -10,7 +9,6 @@ class Program
     {
         var usageProvider = new ApplicationUsage();
 
-        var entryAssembly = Assembly.GetEntryAssembly();
         var assemblies = new List<Assembly>
         {
             typeof(Program).Assembly
@@ -26,14 +24,14 @@ class Program
             {
                 var year = int.Parse(m[1]);
                 var day = int.Parse(m[2]);
-                return () => Updater.Update(year, day, solverTypes, usageProvider).Wait();
+                return () => Updater.Update(year, day, solverTypes).Wait();
             }) ??
-            Command(args, Args("update", "last"), m =>
+            Command(args, Args("update", "last"), _ =>
             {
                 var dt = DateTime.Now;
-                if (dt.Month == 12 && dt.Day >= 1 && dt.Day <= 25)
+                if (dt.Month == 12 && dt.Day is >= 1 and <= 25)
                 {
-                    return () => Updater.Update(dt.Year, dt.Day, solverTypes, usageProvider).Wait();
+                    return () => Updater.Update(dt.Year, dt.Day, solverTypes).Wait();
                 }
                 else
                 {
@@ -44,40 +42,40 @@ class Program
              {
                  var year = int.Parse(m[0]);
                  var day = int.Parse(m[1]);
-                 var tsolversSelected = solverTypes.First(tsolver =>
-                                 SolverExtensions.Year(tsolver) == year &&
-                                 SolverExtensions.Day(tsolver) == day);
-                 return () => Runner.RunAll(tsolversSelected);
+                 var selectedSolverType = solverTypes.First(solverType =>
+                                 SolverExtensions.Year(solverType) == year &&
+                                 SolverExtensions.Day(solverType) == day);
+                 return () => Runner.RunAll(selectedSolverType);
              }) ??
              Command(args, Args("[0-9]+"), m =>
              {
                  var year = int.Parse(m[0]);
-                 var tsolversSelected = solverTypes.Where(tsolver =>
-                                 SolverExtensions.Year(tsolver) == year);
-                 return () => Runner.RunAll(tsolversSelected.ToArray());
+                 var selectedSolverTypes = solverTypes.Where(solverType =>
+                                 SolverExtensions.Year(solverType) == year);
+                 return () => Runner.RunAll(selectedSolverTypes.ToArray());
              }) ??
             Command(args, Args("([0-9]+)[/-]last"), m =>
             {
                 var year = int.Parse(m[0]);
-                var tsolversSelected = solverTypes.Last(tsolver =>
-                    SolverExtensions.Year(tsolver) == year);
-                return () => Runner.RunAll(tsolversSelected);
+                var selectedSolverTypes = solverTypes.Last(solverType =>
+                    SolverExtensions.Year(solverType) == year);
+                return () => Runner.RunAll(selectedSolverTypes);
             }) ??
             Command(args, Args("([0-9]+)[/-]all"), m =>
             {
                 var year = int.Parse(m[0]);
-                var tsolversSelected = solverTypes.Where(tsolver =>
-                    SolverExtensions.Year(tsolver) == year);
-                return () => Runner.RunAll(tsolversSelected.ToArray());
+                var selectedSolverTypes = solverTypes.Where(solverType =>
+                    SolverExtensions.Year(solverType) == year);
+                return () => Runner.RunAll(selectedSolverTypes.ToArray());
             }) ??
-            Command(args, Args("all"), m =>
+            Command(args, Args("all"), _ =>
             {
                 return () => Runner.RunAll(solverTypes);
             }) ??
-            Command(args, Args("last"), m =>
+            Command(args, Args("last"), _ =>
             {
-                var tsolversSelected = solverTypes.Last();
-                return () => Runner.RunAll(tsolversSelected);
+                var selectedSolverTypes = solverTypes.Last();
+                return () => Runner.RunAll(selectedSolverTypes);
             }) ??
             new Action(() =>
             {
@@ -87,13 +85,13 @@ class Program
         action();
     }
 
-    static Action? Command(string[] args, string[] regexes, Func<string[], Action> parse)
+    private static Action? Command(IReadOnlyCollection<string> args, IReadOnlyCollection<string> regularExpressions, Func<string[], Action> parse)
     {
-        if (args.Length != regexes.Length)
+        if (args.Count != regularExpressions.Count)
         {
             return null;
         }
-        var matches = Enumerable.Zip(args, regexes, (arg, regex) => new Regex("^" + regex + "$").Match(arg));
+        var matches = args.Zip(regularExpressions, (arg, regex) => new Regex("^" + regex + "$").Match(arg)).ToArray();
         if (!matches.All(match => match.Success))
         {
             return null;
@@ -109,7 +107,7 @@ class Program
         }
     }
 
-    static string[] Args(params string[] regex)
+    private static string[] Args(params string[] regex)
     {
         return regex;
     }

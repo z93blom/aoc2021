@@ -8,7 +8,7 @@ public class Updater
 {
     public const string SessionEnvironmentName = "AOC-SESSION";
 
-    public static async Task Update(int year, int day, IEnumerable<Type> solvers, IUsageProvider usageProvider)
+    public static async Task Update(int year, int day, IEnumerable<Type> solvers)
     {
         if (!Environment.GetEnvironmentVariables().Contains(SessionEnvironmentName))
         {
