@@ -21,12 +21,12 @@ class Solution : ISolver
         var lines = input.Lines()
             .Matches(@"(\d+),(\d+)\s*->\s*(\d+),(\d+)")
             .Select(lineGroup => lineGroup.Select(g => int.Parse(g.Value)).ToArray())
-            .Select(i =>  new Line(new Point(i[0], i[1]), new Point(i[2], i[3])))
+            .Select(i =>  new Line(new Point2(i[0], i[1]), new Point2(i[2], i[3])))
             .ToArray();
 
         // Get the number of points where at least two lines overlap.
 
-        var covered = new Dictionary<Point, int>();
+        var covered = new Dictionary<Point2, int>();
         foreach (var line in lines
             .Where(line => line.IsHorizontal || line.IsVertical))
         {
@@ -52,12 +52,12 @@ class Solution : ISolver
         var lines = input.Lines()
             .Matches(@"(\d+),(\d+)\s*->\s*(\d+),(\d+)")
             .Select(lineGroup => lineGroup.Select(g => int.Parse(g.Value)).ToArray())
-            .Select(i => new Line(new Point(i[0], i[1]), new Point(i[2], i[3])))
+            .Select(i => new Line(new Point2(i[0], i[1]), new Point2(i[2], i[3])))
             .ToArray();
 
         // Get the number of points where at least two lines overlap.
 
-        var covered = new Dictionary<Point, int>();
+        var covered = new Dictionary<Point2, int>();
         foreach (var line in lines)
         {
             foreach (var p in line.CoveredPoints)
@@ -78,13 +78,13 @@ class Solution : ISolver
 
     private class Line
     {
-        public Point P1 { get; }
-        public Point P2 { get; }
+        public Point2 P1 { get; }
+        public Point2 P2 { get; }
 
         public bool IsHorizontal => P1.Y == P2.Y;
         public bool IsVertical => P1.X == P2.X;
 
-        public Line(Point p1, Point p2)
+        public Line(Point2 p1, Point2 p2)
         {
             if (p1.X == p2.X)
             {
@@ -114,7 +114,7 @@ class Solution : ISolver
             }
         }
 
-        public IEnumerable<Point> CoveredPoints
+        public IEnumerable<Point2> CoveredPoints
         {
             get
             {
@@ -123,7 +123,7 @@ class Solution : ISolver
                     var x = P1.X;
                     while(x <= P2.X)
                     {
-                        yield return new Point(x++, P1.Y);
+                        yield return new Point2(x++, P1.Y);
                     }
                 }
                 else if (IsVertical)
@@ -131,7 +131,7 @@ class Solution : ISolver
                     var y = P1.Y;
                     while (y <= P2.Y)
                     {
-                        yield return new Point(P1.X, y++);
+                        yield return new Point2(P1.X, y++);
                     }
                 }
                 else
@@ -141,7 +141,7 @@ class Solution : ISolver
                     var increasingY = P1.Y < P2.Y;
                     while (x <= P2.X)
                     {
-                        yield return new Point(x, y);
+                        yield return new Point2(x, y);
                         x++;
                         y += increasingY ? 1 : -1;
                     }

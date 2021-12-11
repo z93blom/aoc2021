@@ -18,57 +18,69 @@ class Solution : ISolver
 
     static object PartOne(string input)
     {
-        var grid = new Grid(input);
+        var grid = ParseGrid(input);
 
-        var riskLevels = grid.Points()
-            .Where(p => grid.IsLow(p.x, p.y))
-            .Select(p => p.z + 1)
+        var riskLevels = grid.Points
+            .Where(p => IsLow(grid, p))
+            .Select(p => grid[p] + 1)
             .Sum();
         
         return riskLevels;
     }
 
-    public static int ToInt(char c)
+    private static Grid<int> ParseGrid(string input)
     {
-        return c switch
+        var lines = input.Lines().ToArray();
+
+        var g = new Grid<int>(lines[0].Length, lines.Length);
+        var y = 0;
+        foreach (var line in lines)
         {
-            '0' => 0,
-            '1' => 1,
-            '2' => 2,
-            '3' => 3,
-            '4' => 4,
-            '5' => 5,
-            '6' => 6,
-            '7' => 7,
-            '8' => 8,
-            '9' => 9,
-            _ => -1,
-        };
+            var x = 0;
+            foreach (var c in line)
+            {
+                g[x++, y] = c - '0';
+            }
+
+            y++;
+        }
+
+        return g;
+    }
+
+    private static bool IsLow(Grid<int> grid, Point2 point)
+    {
+        var adjacentLow = point.OrthogonalPoints
+            .Where(grid.Contains)
+            .Select(p => grid[p])
+            .Min();
+
+        return grid[point] < adjacentLow;
     }
 
     static object PartTwo(string input)
     {
-        var grid = new Grid(input);
+        var grid = ParseGrid(input);
 
-        var lows = grid.Points()
-            .Where(p => grid.IsLow(p.x, p.y))
+        var lows = grid.Points
+            .Where(p => IsLow(grid, p))
             .ToArray();
 
-        var basins = new Dictionary<Point3, HashSet<Point3>>();
+        var basins = new Dictionary<Point2, HashSet<Point2>>();
 
-        foreach(var p in lows)
+        foreach(var basinStart in lows)
         {
-            basins.Add(p, new HashSet<Point3>());
-            var basin = basins[p];
-            var queue = new Queue<Point3>();
-            queue.Enqueue(p);
+            basins.Add(basinStart, new HashSet<Point2>());
+            var basin = basins[basinStart];
+            var queue = new Queue<Point2>();
+            queue.Enqueue(basinStart);
             while(queue.Count > 0)
             {
-                var pp = queue.Dequeue();
-                basin.Add(pp);
-                foreach(var adj in grid.Adjacencies(pp.x, pp.y))
+                var point = queue.Dequeue();
+                basin.Add(point);
+                foreach(var adj in point.OrthogonalPoints.Where(grid.Contains))
                 {
-                    if(adj.z < 9 && !basin.Contains(adj) && !queue.Contains(adj))
+                    if(grid[adj] < 9 && !basin.Contains(adj) && !queue.Contains(adj))
                     {
                         queue.Enqueue(adj);
                     }
@@ -76,99 +88,10 @@ class Solution : ISolver
             }
         }
 
-        //var topThree = basins.OrderBy(b => b.Value.Count)
-        //            .Take(3)
-        //            .ToArray();
-        //var value = topThree[0].Value.Count * topThree[1].Value.Count * topThree[2].Value.Count;
         var value = basins.OrderByDescending(b => b.Value.Count)
                     .Take(3)
             .Aggregate(1, (agg, b) => b.Value.Count * agg);
 
         return value;
-    }
-
-    private class Grid
-    {
-        private readonly int[,] _grid;
-        private readonly int _width;
-        private readonly int _height;
-
-        public Grid(string input)
-        {
-            var lines = input.Lines().ToArray();
-            _width = lines[0].Length;
-            _height = lines.Length;
-            _grid = new int[_width, _height];
-            int y = 0;
-            foreach (var line in lines)
-            {
-                var x = 0;
-                foreach (var c in line.Select(ToInt))
-                {
-                    _grid[x++, y] = c;
-                }
-                y++;
-            }
-        }
-
-        public IEnumerable<Point3> Points()
-        {
-            for(var x = 0; x < _width; x++)
-            {
-                for (var y = 0; y < _height; y++)
-                {
-                    yield return  new Point3(x, y, _grid[x, y]);
-                }
-            }
-        }
-
-        public bool IsLow(int x, int y)
-        {
-            var adjLow = Adjacencies(x, y).Select(p => p.z).Min();
-            return _grid[x, y] < adjLow;
-        }
-
-        public IEnumerable<Point3> Adjacencies(int x, int y)
-        {
-            if (x < 0 || x >= _width || y < 0 || y >= _height)
-            {
-                yield break;
-            }
-
-            if (x - 1 >= 0)
-            {
-                yield return  new Point3(x - 1, y, _grid[x - 1, y]);
-            }
-
-            if (x + 1 < _width)
-            {
-                yield return new Point3(x +1, y, _grid[x + 1, y]);
-            }
-
-            if (y - 1 >= 0)
-            {
-                yield return new Point3(x, y - 1, _grid[x, y - 1]);
-            }
-
-            if (y + 1 < _height)
-            {
-                yield return new Point3(x, y + 1, _grid[x, y + 1]);
-            }
-        }
-
-    }
-
-    public struct Point3
-    {
-        public int x;
-        public int y;
-        public int z;
-
-        public Point3(int x, int y, int z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
     }
 }
