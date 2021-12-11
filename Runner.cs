@@ -43,6 +43,7 @@ public class Runner
             }).ToArray();
 
             var commonPrefix = GetLongestCommonPrefix(allFiles);
+
             var root = new Tree($"[white]{solver.DayName()}: {solver.GetName()}[/]")
             {
                 Style = new Style()
@@ -122,13 +123,23 @@ public class Runner
         }
     }
 
-    private static string GetLongestCommonPrefix(string[] s)
+    private static string GetLongestCommonPrefix(IReadOnlyList<string> s)
     {
-        int k = s[0].Length;
-        for (int i = 1; i < s.Length; i++)
+        if (s.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        if (s.Count == 1)
+        {
+            return Path.GetDirectoryName(s[0]) + "\\";
+        }
+
+        var k = s[0].Length;
+        for (var i = 1; i < s.Count; i++)
         {
             k = Math.Min(k, s[i].Length);
-            for (int j = 0; j < k; j++)
+            for (var j = 0; j < k; j++)
                 if (s[i][j] != s[0][j])
                 {
                     k = j;
