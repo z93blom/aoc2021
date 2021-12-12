@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using AdventOfCode.Generator;
 using AdventOfCode.Model;
@@ -58,6 +59,13 @@ public class Updater
 
     static void WriteFile(string file, string content)
     {
+        var dir = Path.GetDirectoryName(file);
+        if (!Directory.Exists(dir))
+        {
+            Debug.Assert(dir != null, nameof(dir) + " != null");
+            Directory.CreateDirectory(dir);
+        }
+
         Console.WriteLine($"Writing {file}");
         File.WriteAllText(file, content);
     }
