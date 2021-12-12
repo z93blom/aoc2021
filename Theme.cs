@@ -44,18 +44,18 @@ public static class Theme
 
             ["calendar-lightbeam"] = 0xffff66,
 
-            ["calendar-color-s"] = 0x999999,
             ["calendar-color-b"] = 0x0066ff,
-            ["calendar-color-e"] = 0xcccccc,
-            ["calendar-color-r"] = 0xff0000,
             ["calendar-color-d"] = 0x880000,
-            ["calendar-color-n"] = 0x886655,
-            ["calendar-color-k"] = 0xcccccc,
+            ["calendar-color-e"] = 0xcccccc,
             ["calendar-color-g"] = 0x009900,
-            ["calendar-color-w"] = 0xcccccc,
-            ["calendar-color-t"] = 0xcccccc,
             ["calendar-color-i"] = 0xff0000,
-            ["calendar-color-y"] = 0xffff66,
+            ["calendar-color-k"] = 0xcccccc,
+            ["calendar-color-n"] = 0x886655,
+            ["calendar-color-o"] = 0xc74c30,
+            ["calendar-color-r"] = 0xff0000,
+            ["calendar-color-s"] = 0x999999,
+            ["calendar-color-t"] = 0xcccccc,
+            ["calendar-color-w"] = 0xcccccc,
             ["calendar-color-w1"] = 0x00c8ff,
             ["calendar-color-w2"] = 0x00b5ed,
             ["calendar-color-w3"] = 0x00a2db,
@@ -66,7 +66,9 @@ public static class Theme
             ["calendar-color-w8"] = 0x00619f,
             ["calendar-color-w9"] = 0x005a98,
             ["calendar-color-w10"] = 0x005291,
-            ["calendar-color-o"] = 0xc74c30,
+            ["calendar-color-w11"] = 0x004a8a,
+            ["calendar-color-w12"] = 0x004282,
+            ["calendar-color-y"] = 0xffff66,
         };
     }
 }
