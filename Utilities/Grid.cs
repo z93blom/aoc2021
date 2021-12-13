@@ -4,11 +4,11 @@ namespace AdventOfCode.Utilities;
 
 public class Grid<T>
 {
-    public int Width { get; }
-    public int Height { get; }
+    public long Width { get; }
+    public long Height { get; }
     private readonly T[,] _values;
 
-    public Grid(int width, int height)
+    public Grid(long width, long height)
     {
         Width = width;
         Height = height;
