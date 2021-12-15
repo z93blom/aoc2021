@@ -70,6 +70,7 @@ public static class Theme
             ["calendar-color-w12"] = 0x004282,
             ["calendar-color-w13"] = 0x003b7b,
             ["calendar-color-w14"] = 0x003374,
+            ["calendar-color-w15"] = 0x002e6f,
             ["calendar-color-y"] = 0xffff66,
         };
     }
