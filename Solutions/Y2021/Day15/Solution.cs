@@ -34,7 +34,7 @@ class Solution : ISolver
             for (var x = 0; x < line.Length; x++)
             {
                 var point = new Point2(x, y);
-                var node = new Node(lines, point);
+                var node = new Node(point, lines[y][x] - '0');
                 nodes.Add(point, node);
                 graph.AddVertex(node);
             }
@@ -88,15 +88,14 @@ class Solution : ISolver
     public class Node
     {
         public Point2 Point { get; }
-        private readonly string[] _lines;
+        public int Value { get; }
 
-        public Node(string[] lines, Point2 point)
+        public Node(Point2 point, int value)
         {
             Point = point;
-            _lines = lines;
+            Value = value;
         }
 
-        public int Value => _lines[Point.Y][(int)Point.X] - '0';
 
         public override string ToString()
         {
@@ -106,6 +105,60 @@ class Solution : ISolver
 
     static object PartTwo(string input)
     {
-        return 0;
+        var lines = input.Lines()
+            .ToArray();
+
+        var graph = new AdjacencyGraph<Node, Edge>();
+        var nodes = new Dictionary<Point2, Node>();
+        var width = lines[0].Length;
+        var height = lines.Length;
+        var y = 0;
+        foreach (var line in lines)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                var value = lines[y][x] - '1';
+
+                for (var yOffset = 0; yOffset < 5; yOffset++)
+                {
+                    for (var xOffset = 0; xOffset < 5; xOffset++)
+                    {
+                        var point = new Point2(x + xOffset * width, y + yOffset * width);
+                        var val = (value + xOffset + yOffset) % 9 + 1;
+                        var node = new Node(point, val);
+                        nodes.Add(point, node);
+                        graph.AddVertex(node);
+                    }
+                }
+
+            }
+
+            y++;
+        }
+
+        foreach (var node in nodes.Values)
+        {
+            foreach (var point in node.Point.OrthogonalPoints)
+            {
+                if (nodes.ContainsKey(point))
+                {
+                    graph.AddEdge(new Edge(node, nodes[point]));
+                }
+            }
+        }
+
+        var start = nodes[new Point2(0, 0)];
+        var end = nodes[new Point2(lines[0].Length * 5 - 1, lines.Length * 5 - 1)];
+        var shortestPath = graph.ShortestPathsDijkstra(edge => edge.Target.Value, start);
+
+        if (shortestPath(end, out var result))
+        {
+            var totalRisk = result.Sum(edge => edge.Target.Value);
+            return totalRisk;
+        }
+        else
+        {
+            throw new Exception("Unable to find a path!");
+        }
     }
 }
