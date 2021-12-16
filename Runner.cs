@@ -50,76 +50,85 @@ public class Runner
                     .Foreground(Color.Grey35)
             };
 
-            var stopWatch = new Stopwatch();
-            foreach (var file in allFiles)
-            {
-                var filePresentation = file.Substring(commonPrefix.Length, file.Length - commonPrefix.Length - Path.GetExtension(file).Length);
-                var fileNode = root.AddNode(filePresentation);
-                var table = new Table()
-                    .Border(TableBorder.Horizontal)
-                    .BorderColor(Color.Grey35);
-                table.AddColumn("Part");
-                table.AddColumn("Value");
-                table.AddColumn("Time (ms)", tc => tc.Alignment(Justify.Right));
-                table.AddColumn("Error");
-                var partIndex = 0;
-                var valueIndex = 1;
-                var timeIndex = 2;
-                var errorIndex = 3;
-
-                var refoutFile = file.Replace(".in", ".refout");
-                var refout = File.Exists(refoutFile) ? File.ReadAllLines(refoutFile) : null;
-                var input = File.ReadAllText(file).TrimEnd();
-                var iline = 0;
-                stopWatch.Start();
-                var partNumber = 1;
-                foreach (var line in solver.Solve(input))
+            AnsiConsole.Live(root)
+                .AutoClear(false)
+                .Overflow(VerticalOverflow.Visible)
+                .Start(ctx =>
                 {
-                    var elapsed = stopWatch.Elapsed;
-                    var parts = new string[4];
-
-                    if (refout == null || refout.Length <= iline)
+                    var stopWatch = new Stopwatch();
+                    foreach (var file in allFiles)
                     {
-                        parts[partIndex] = $"{partNumber++} [cyan]?[/]";
-                        parts[errorIndex] = "";
-                    }
-                    else if (refout[iline] == line.ToString())
-                    {
-                        parts[partIndex] = $"{partNumber++} [darkgreen]✓[/]";
-                        parts[errorIndex] = "";
-                    }
-                    else
-                    {
-                        parts[partIndex] = $"{partNumber++} [red]X[/]";
-                        parts[errorIndex] = $"{solver.DayName()}: In line {iline + 1} expected '{refout[iline]}' but found '{line}'";
-                    }
+                        var filePresentation = file.Substring(commonPrefix.Length,
+                            file.Length - commonPrefix.Length - Path.GetExtension(file).Length);
+                        var fileNode = root.AddNode(filePresentation);
+                        var table = new Table()
+                            .Border(TableBorder.Horizontal)
+                            .BorderColor(Color.Grey35);
+                        table.AddColumn("Part");
+                        table.AddColumn("[bold]Value[/]");
+                        table.AddColumn("Time (ms)", tc => tc.Alignment(Justify.Right));
+                        table.AddColumn("Error");
+                        fileNode.AddNode(table);
+                        ctx.Refresh();
 
-                    parts[valueIndex] = $"{line}";
+                        var partIndex = 0;
+                        var valueIndex = 1;
+                        var timeIndex = 2;
+                        var errorIndex = 3;
 
-                    var milliseconds = elapsed.Ticks / (double)TimeSpan.TicksPerMillisecond;
-                    if (elapsed > TimeSpan.FromMilliseconds(1000))
-                    {
-                        parts[timeIndex] = $"[red]{milliseconds:0.###}[/]";
+                        var refoutFile = file.Replace(".in", ".refout");
+                        var refout = File.Exists(refoutFile) ? File.ReadAllLines(refoutFile) : null;
+                        var input = File.ReadAllText(file).TrimEnd();
+                        var iline = 0;
+                        stopWatch.Start();
+                        var partNumber = 1;
+                        foreach (var line in solver.Solve(input))
+                        {
+                            var elapsed = stopWatch.Elapsed;
+                            var parts = new string[4];
+
+                            if (refout == null || refout.Length <= iline)
+                            {
+                                parts[partIndex] = $"{partNumber++} [cyan]?[/]";
+                                parts[errorIndex] = "";
+                            }
+                            else if (refout[iline] == line.ToString())
+                            {
+                                parts[partIndex] = $"{partNumber++} [darkgreen]✓[/]";
+                                parts[errorIndex] = "";
+                            }
+                            else
+                            {
+                                parts[partIndex] = $"{partNumber++} [red]X[/]";
+                                parts[errorIndex] =
+                                    $"{solver.DayName()}: In line {iline + 1} expected '{refout[iline]}' but found '{line}'";
+                            }
+
+                            parts[valueIndex] = $"[bold]{line}[/]";
+
+                            var milliseconds = elapsed.Ticks / (double)TimeSpan.TicksPerMillisecond;
+                            if (elapsed > TimeSpan.FromMilliseconds(1000))
+                            {
+                                parts[timeIndex] = $"[red]{milliseconds:N3}[/]";
+                            }
+                            else if (elapsed > TimeSpan.FromMilliseconds(500))
+                            {
+                                parts[timeIndex] = $"[darkorange3_1]{milliseconds:N3}[/]";
+                            }
+                            else
+                            {
+                                parts[timeIndex] = $"[darkgreen]{milliseconds:N3}[/]";
+                            }
+
+                            table.AddRow(parts);
+                            ctx.Refresh();
+                            stopWatch.Restart();
+                            iline++;
+                        }
+
+
                     }
-                    else if (elapsed > TimeSpan.FromMilliseconds(500))
-                    {
-                        parts[timeIndex] = $"[darkorange3_1]{milliseconds:0.###}[/]";
-                    }
-                    else
-                    {
-                        parts[timeIndex] = $"[darkgreen]{milliseconds:0.###}[/]";
-                    }
-
-                    table.AddRow(parts);
-                    stopWatch.Restart();
-                    iline++;
-                }
-
-                fileNode.AddNode(table);
-            }
-
-            AnsiConsole.Write(root);
-            AnsiConsole.WriteLine();
+                });
         }
     }
 
