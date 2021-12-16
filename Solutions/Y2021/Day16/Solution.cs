@@ -16,8 +16,11 @@ class Solution : ISolver
 
     public IEnumerable<object> Solve(string input)
     {
-        yield return PartOne(input);
-        yield return PartTwo(input);
+        yield return PartOne(input.Lines().First());
+        foreach (var line in input.Lines())
+        {
+            yield return PartTwo(line);
+        }
     }
 
     static object PartOne(string input)
@@ -85,7 +88,6 @@ class Solution : ISolver
 
     static object PartTwo(string input)
     {
-
         var bits = ToBits(input);
 
         var packetReader = new PacketReader(bits);
