@@ -22,18 +22,7 @@ class Solution : ISolver
 
     static object PartOne(string input)
     {
-        var bytes = Convert.FromHexString(input);
-        var bits = bytes.SelectMany(b => new[]
-        {
-            (b & 128) == 128,
-            (b & 64) == 64,
-            (b & 32) == 32,
-            (b & 16) == 16,
-            (b & 8) == 8,
-            (b & 4) == 4,
-            (b & 2) == 2,
-            (b & 1) == 1,
-        }).ToArray();
+        var bits = ToBits(input);
 
         var packetReader = new PacketReader(bits);
 
@@ -43,6 +32,34 @@ class Solution : ISolver
         packet.Visit(visitor);
 
         return visitor.Sum;
+    }
+
+    private static bool[] ToBits(string input)
+    {
+        return input.SelectMany(c =>
+        {
+            var bits = c switch
+            {
+                '0' => new[] { false, false, false, false },
+                '1' => new[] { false, false, false, true },
+                '2' => new[] { false, false, true, false },
+                '3' => new[] { false, false, true, true },
+                '4' => new[] { false, true, false, false },
+                '5' => new[] { false, true, false, true },
+                '6' => new[] { false, true, true, false },
+                '7' => new[] { false, true, true, true },
+                '8' => new[] { true, false, false, false },
+                '9' => new[] { true, false, false, true },
+                'A' => new[] { true, false, true, false },
+                'B' => new[] { true, false, true, true },
+                'C' => new[] { true, true, false, false },
+                'D' => new[] { true, true, false, true },
+                'E' => new[] { true, true, true, false },
+                'F' => new[] { true, true, true, true },
+                _ => throw new NotImplementedException()
+            };
+            return bits;
+        }).ToArray();
     }
 
     private class VersionSumVisitor : IPacketVisitor
@@ -56,12 +73,26 @@ class Solution : ISolver
         public void Visit(UnknownOperatorPacket unknownOperatorPacket)
         {
             Sum += unknownOperatorPacket.Header.Version;
+            unknownOperatorPacket.VisitChildren(this);
+        }
+
+        public void Visit(KnownOperatorPacket knownOperatorPacket)
+        {
+            Sum += knownOperatorPacket.Header.Version;
+            knownOperatorPacket.VisitChildren(this);
         }
     }
 
     static object PartTwo(string input)
     {
-        return 0;
+
+        var bits = ToBits(input);
+
+        var packetReader = new PacketReader(bits);
+
+        var packet = packetReader.ReadPacket();
+        var value = packet.CalculateValue();
+        return value;
     }
 
     public ref struct PacketReader
@@ -130,6 +161,45 @@ class Solution : ISolver
 
         public OperatorPacket ReadOperatorPacket(Header header)
         {
+            var subPackets = ReadSubPackets();
+            switch (header.PacketType)
+            {
+                case 0:
+                    // Sum packet.
+                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Sum(c => c.CalculateValue()));
+
+                case 1:
+                    // Product packet.
+                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Aggregate(1L, (v, c) => v * c.CalculateValue()));
+
+                case 2:
+                    // Minimum packet.
+                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Min(c => c.CalculateValue()));
+
+                case 3:
+                    // Maximum packet.
+                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Max(c => c.CalculateValue()));
+
+                case 5:
+                    // Greater than packet.
+                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets[0].CalculateValue() > p.SubPackets[1].CalculateValue() ? 1 : 0);
+
+                case 6:
+                    // Less than packet.
+                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets[0].CalculateValue() < p.SubPackets[1].CalculateValue() ? 1 : 0);
+
+                case 7:
+                    // Equal to packet.
+                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets[0].CalculateValue() == p.SubPackets[1].CalculateValue() ? 1 : 0);
+
+                default:
+                    return new UnknownOperatorPacket(header, subPackets);
+            }
+        }
+
+        private Packet[] ReadSubPackets()
+        {
+            Packet[] children;
             var lengthTypeId = ReadInt(1);
             switch (lengthTypeId)
             {
@@ -142,18 +212,23 @@ class Solution : ISolver
                     {
                         list.Add(subPacketReader.ReadPacket());
                     }
-                    return new UnknownOperatorPacket(header, list.ToArray());
+
+                    children = list.ToArray();
+                    break;
                 case 1:
                     var numberOfSubPackets = ReadInt(11);
-                    var subPackets = new Packet[numberOfSubPackets];
+                    children = new Packet[numberOfSubPackets];
                     for (var i = 0; i < numberOfSubPackets; i++)
                     {
-                        subPackets[i] = ReadSinglePacket();
+                        children[i] = ReadSinglePacket();
                     }
-                    return new UnknownOperatorPacket(header, subPackets);
+
+                    break;
                 default:
                     throw new ArgumentException($"Unknown operator type id: {lengthTypeId}");
             }
+
+            return children;
         }
 
         private Header ReadHeader()
@@ -192,9 +267,36 @@ class Solution : ISolver
         public override void Visit(IPacketVisitor visitor)
         {
             visitor.Visit(this);
-            VisitChildren(visitor);
+        }
+
+        public override long CalculateValue()
+        {
+            throw new InvalidOperationException(
+                $"Trying to calculate the value of an unknown operator ('{Header.PacketType}') is not supported. ");
         }
     }
+
+    public class KnownOperatorPacket : OperatorPacket
+    {
+        private readonly Func<Packet, long> _valueFunction;
+
+        public KnownOperatorPacket(Header header, Packet[] subPackets, Func<Packet, long> valueFunction)
+            : base(header, subPackets)
+        {
+            _valueFunction = valueFunction;
+        }
+
+        public override void Visit(IPacketVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override long CalculateValue()
+        {
+            return _valueFunction(this);
+        }
+    }
+
 
     public abstract class OperatorPacket : Packet
     {
@@ -206,7 +308,7 @@ class Solution : ISolver
 
     public class LiteralPacket : Packet
     {
-        private long Value { get; }
+        public long Value { get; }
 
         public LiteralPacket(Header header, long value)
             : base(header, Array.Empty<Packet>())
@@ -217,6 +319,11 @@ class Solution : ISolver
         public override void Visit(IPacketVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        public override long CalculateValue()
+        {
+            return Value;
         }
     }
 
@@ -246,19 +353,22 @@ class Solution : ISolver
 
         public abstract void Visit(IPacketVisitor visitor);
 
-        protected void VisitChildren(IPacketVisitor visitor)
+        public void VisitChildren(IPacketVisitor visitor)
         {
             foreach (var subPacket in SubPackets)
             {
                 subPacket.Visit(visitor);
             }
         }
+        public abstract long CalculateValue();
     }
 
     public interface IPacketVisitor
     {
         void Visit(LiteralPacket literalPacket);
         void Visit(UnknownOperatorPacket unknownOperatorPacket);
+
+        void Visit(KnownOperatorPacket knownOperatorPacket);
     }
 
 }
