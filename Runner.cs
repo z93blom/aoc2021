@@ -6,21 +6,15 @@ namespace AdventOfCode;
 
 public class Runner
 {
-
-    public static void RunAll(params Type[] tsolvers)
+    public static void RunAll(params ISolver[] solvers)
     {
         var lastYear = -1;
-        foreach (var solver in tsolvers.Select(tsolver => Activator.CreateInstance(tsolver) as ISolver))
+        foreach (var solver in solvers)
         {
-            if (solver == null)
-            {
-                continue;
-            }
-
-            if (lastYear != solver.Year())
+            if (lastYear != solver.Year)
             {
                 solver.SplashScreen().Show();
-                lastYear = solver.Year();
+                lastYear = solver.Year;
             }
 
             var workingDir = solver.WorkingDir();
@@ -131,6 +125,7 @@ public class Runner
                 });
         }
     }
+
 
     private static string GetLongestCommonPrefix(IReadOnlyList<string> s)
     {

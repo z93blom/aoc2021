@@ -6,13 +6,9 @@ public static class SolverExtensions
 {
     public static string DayName(this ISolver solver)
     {
-        return $"Day {solver.Day()}";
+        return $"Day {solver.Day}";
     }
 
-    public static int Year(this ISolver solver)
-    {
-        return Year(solver.GetType());
-    }
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
     public static int Year(Type t)
@@ -27,11 +23,6 @@ public static class SolverExtensions
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
 
-    public static int Day(this ISolver solver)
-    {
-        return Day(solver.GetType());
-    }
-
     public static string WorkingDir(int year)
     {
         return Path.Combine("Solutions", $"Y{year}");
@@ -44,17 +35,17 @@ public static class SolverExtensions
 
     public static string WorkingDir(this ISolver solver)
     {
-        return WorkingDir(solver.Year(), solver.Day());
+        return WorkingDir(solver.Year, solver.Day);
     }
 
     public static SplashScreen SplashScreen(this ISolver solver)
     {
-        var tsplashScreen = solver.GetType().Assembly.GetTypes()
+        var splashScreenType = solver.GetType().Assembly.GetTypes()
              .Where(t => t.GetTypeInfo().IsClass && !t.IsAbstract && typeof(SplashScreen).IsAssignableFrom(t))
-             .Single(t => Year(t) == solver.Year());
+             .Single(t => Year(t) == solver.Year);
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8603 // Possible null reference return.
-        return (SplashScreen)Activator.CreateInstance(tsplashScreen);
+        return (SplashScreen)Activator.CreateInstance(splashScreenType);
 #pragma warning restore CS8603 // Possible null reference return.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
     }

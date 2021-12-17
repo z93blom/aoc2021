@@ -77,7 +77,7 @@ class Solution : ISolver
         {
             for (var xVelocity = 0; xVelocity < 1000; xVelocity++)
             {
-                var (hit, yMax) = Simulate(xVelocity, yVelocity, lowBounds, highBounds);
+                var (hit, _) = Simulate(xVelocity, yVelocity, lowBounds, highBounds);
                 if (hit)
                 {
                     hits++;

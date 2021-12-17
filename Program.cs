@@ -1,11 +1,14 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace AdventOfCode;
 
-class Program
+partial class Program
 {
-    static void Main(string[] args)
+    static  void Main(string[] args)
     {
         var usageProvider = new ApplicationUsage();
 
@@ -19,6 +22,21 @@ class Program
             .OrderBy(t => t.FullName)
             .ToArray();
 
+        var host = Host.CreateDefaultBuilder(args)
+            .ConfigureServices((_, services) =>
+            {
+                foreach (var solverType in solverTypes)
+                {
+                    services.AddTransient(solverType);
+                }
+
+                services.AddSingleton<IResolver>(s => new Resolver(s, solverTypes));
+            })
+            .Build();
+
+        var solverResolver = host.Services.GetService<IResolver>();
+        Debug.Assert(solverResolver != null, nameof(solverResolver) + " != null");
+
         var action =
             Command(args, Args("update", "([0-9]+)[/-]([0-9]+)"), m =>
             {
@@ -28,54 +46,64 @@ class Program
             }) ??
             Command(args, Args("update", "last"), _ =>
             {
-                var dt = DateTime.Now;
-                if (dt.Month == 12 && dt.Day is >= 1 and <= 25)
+                var now = DateTime.Now;
+                if (now.Month == 12 && now.Day is >= 1 and <= 25)
                 {
-                    return () => Updater.Update(dt.Year, dt.Day, solverTypes).Wait();
+                    return () => Updater.Update(now.Year, now.Day, solverTypes).Wait();
                 }
                 else
                 {
                     throw new Exception("Event is not active. This option works in Dec 1-25 only)");
                 }
             }) ??
-             Command(args, Args("([0-9]+)[/-]([0-9]+)"), m =>
-             {
+            Command(args, Args("([0-9]+)[/-]([0-9]+)"), m =>
+            {
                  var year = int.Parse(m[0]);
                  var day = int.Parse(m[1]);
-                 var selectedSolverType = solverTypes.First(solverType =>
-                                 SolverExtensions.Year(solverType) == year &&
-                                 SolverExtensions.Day(solverType) == day);
-                 return () => Runner.RunAll(selectedSolverType);
-             }) ??
-             Command(args, Args("[0-9]+"), m =>
-             {
-                 var year = int.Parse(m[0]);
-                 var selectedSolverTypes = solverTypes.Where(solverType =>
-                                 SolverExtensions.Year(solverType) == year);
-                 return () => Runner.RunAll(selectedSolverTypes.ToArray());
-             }) ??
-            Command(args, Args("([0-9]+)[/-]last"), m =>
+                 var solver = solverResolver.GetSolvers(year, day);
+                 return () =>
+                 {
+                     if (solver != null)
+                     {
+                         Runner.RunAll(solver);
+                     }
+                     else
+                     {
+                         Console.WriteLine($"Unable to find a problem solver for {year}-{day}.");
+                     }
+                 };
+            }) ??
+            Command(args, Args("[0-9]+"), m =>
             {
                 var year = int.Parse(m[0]);
-                var selectedSolverTypes = solverTypes.Last(solverType =>
-                    SolverExtensions.Year(solverType) == year);
-                return () => Runner.RunAll(selectedSolverTypes);
+                var solvers = solverResolver.GetSolvers(year).ToArray();
+                return () => Runner.RunAll(solvers);
             }) ??
             Command(args, Args("([0-9]+)[/-]all"), m =>
             {
                 var year = int.Parse(m[0]);
-                var selectedSolverTypes = solverTypes.Where(solverType =>
-                    SolverExtensions.Year(solverType) == year);
-                return () => Runner.RunAll(selectedSolverTypes.ToArray());
+                var solvers = solverResolver.GetSolvers(year).ToArray();
+                return () => Runner.RunAll(solvers);
             }) ??
             Command(args, Args("all"), _ =>
             {
-                return () => Runner.RunAll(solverTypes);
+                var solvers = solverResolver.GetAllSolvers().ToArray();
+                return () => Runner.RunAll(solvers);
             }) ??
             Command(args, Args("last"), _ =>
             {
-                var selectedSolverTypes = solverTypes.Last();
-                return () => Runner.RunAll(selectedSolverTypes);
+                var solver = solverResolver.GetLatestSolver();
+                return () =>
+                {
+                    if (solver != null)
+                    {
+                        Runner.RunAll(solver);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Unable to find a problem solver.");
+                    }
+                };
             }) ??
             new Action(() =>
             {
@@ -111,5 +139,5 @@ class Program
     {
         return regex;
     }
-
+   
 }

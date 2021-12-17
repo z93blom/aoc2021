@@ -1,7 +1,3 @@
-using System.Buffers.Binary;
-using System.Collections;
-using System.Runtime.CompilerServices;
-using System.Text;
 using AdventOfCode.Utilities;
 
 namespace AdventOfCode.Y2021.Day16;
@@ -164,39 +160,35 @@ class Solution : ISolver
         public OperatorPacket ReadOperatorPacket(Header header)
         {
             var subPackets = ReadSubPackets();
-            switch (header.PacketType)
+            return header.PacketType switch
             {
-                case 0:
+                0 =>
                     // Sum packet.
-                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Sum(c => c.CalculateValue()));
-
-                case 1:
+                    new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Sum(c => c.CalculateValue())),
+                1 =>
                     // Product packet.
-                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Aggregate(1L, (v, c) => v * c.CalculateValue()));
-
-                case 2:
+                    new KnownOperatorPacket(header, subPackets,
+                        p => p.SubPackets.Aggregate(1L, (v, c) => v * c.CalculateValue())),
+                2 =>
                     // Minimum packet.
-                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Min(c => c.CalculateValue()));
-
-                case 3:
+                    new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Min(c => c.CalculateValue())),
+                3 =>
                     // Maximum packet.
-                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Max(c => c.CalculateValue()));
-
-                case 5:
+                    new KnownOperatorPacket(header, subPackets, p => p.SubPackets.Max(c => c.CalculateValue())),
+                5 =>
                     // Greater than packet.
-                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets[0].CalculateValue() > p.SubPackets[1].CalculateValue() ? 1 : 0);
-
-                case 6:
+                    new KnownOperatorPacket(header, subPackets,
+                        p => p.SubPackets[0].CalculateValue() > p.SubPackets[1].CalculateValue() ? 1 : 0),
+                6 =>
                     // Less than packet.
-                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets[0].CalculateValue() < p.SubPackets[1].CalculateValue() ? 1 : 0);
-
-                case 7:
+                    new KnownOperatorPacket(header, subPackets,
+                        p => p.SubPackets[0].CalculateValue() < p.SubPackets[1].CalculateValue() ? 1 : 0),
+                7 =>
                     // Equal to packet.
-                    return new KnownOperatorPacket(header, subPackets, p => p.SubPackets[0].CalculateValue() == p.SubPackets[1].CalculateValue() ? 1 : 0);
-
-                default:
-                    return new UnknownOperatorPacket(header, subPackets);
-            }
+                    new KnownOperatorPacket(header, subPackets,
+                        p => p.SubPackets[0].CalculateValue() == p.SubPackets[1].CalculateValue() ? 1 : 0),
+                _ => new UnknownOperatorPacket(header, subPackets)
+            };
         }
 
         private Packet[] ReadSubPackets()
