@@ -1,7 +1,5 @@
 using System.Diagnostics;
-using System.Text;
-using AdventOfCode.Utilities;
-using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using Newtonsoft.Json;
 
 namespace AdventOfCode.Y2021.Day18;
 
@@ -37,12 +35,32 @@ class Solution : ISolver
         }
 
         return number.Magnitude;
-
     }
 
     static object PartTwo(string input)
     {
-        return 0;
+        var reader = new NodeReader(input);
+        var numbers = new List<Node>();
+        while (!reader.End)
+        {
+            numbers.Add(reader.Read());
+        }
+
+        var maxMagnitude = long.MinValue;
+        foreach (var left in numbers)
+        {
+            foreach (var right in numbers)
+            {
+                var nr = new NodeReader(left + "\r\n" + right);
+                var l = nr.Read();
+                var r = nr.Read();
+                var node = l.Add(r);
+                maxMagnitude = Math.Max(maxMagnitude, node.Magnitude);
+            }
+        }
+
+        return maxMagnitude;
+
     }
 
     public class Node
