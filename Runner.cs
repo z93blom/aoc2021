@@ -1,6 +1,7 @@
 using Spectre.Console;
 using System.Diagnostics;
 using System.Text;
+using Spectre.Console.Rendering;
 
 namespace AdventOfCode;
 
@@ -73,45 +74,50 @@ public class Runner
                         var refoutFile = file.Replace(".in", ".refout");
                         var refout = File.Exists(refoutFile) ? File.ReadAllLines(refoutFile) : null;
                         var input = File.ReadAllText(file).TrimEnd();
+                        if (string.IsNullOrEmpty(input))
+                        {
+                            continue;
+                        }
+
                         var iline = 0;
                         stopWatch.Start();
                         var partNumber = 1;
                         foreach (var line in solver.Solve(input))
                         {
                             var elapsed = stopWatch.Elapsed;
-                            var parts = new string[4];
+                            var parts = new IRenderable[4];
 
                             if (refout == null || refout.Length <= iline)
                             {
-                                parts[partIndex] = $"{partNumber++} [cyan]?[/]";
-                                parts[errorIndex] = "";
+                                parts[partIndex] = new Markup($"{partNumber++} [cyan]?[/]");
+                                parts[errorIndex] = new Text("");
                             }
                             else if (refout[iline] == line.ToString())
                             {
-                                parts[partIndex] = $"{partNumber++} [darkgreen]✓[/]";
-                                parts[errorIndex] = "";
+                                parts[partIndex] = new Markup($"{partNumber++} [darkgreen]✓[/]");
+                                parts[errorIndex] = new Text("");
                             }
                             else
                             {
-                                parts[partIndex] = $"{partNumber++} [red]X[/]";
+                                parts[partIndex] = new Markup($"{partNumber++} [red]X[/]");
                                 parts[errorIndex] =
-                                    $"{solver.DayName()}: In line {iline + 1} expected '{refout[iline]}' but found '{line}'";
+                                    new Text($"{solver.DayName()}: In line {iline + 1} expected '{refout[iline]}' but found '{line}'");
                             }
 
-                            parts[valueIndex] = $"[bold]{line}[/]";
+                            parts[valueIndex] = new Text($"{line}", new Style().Decoration(Decoration.Bold));
 
                             var milliseconds = elapsed.Ticks / (double)TimeSpan.TicksPerMillisecond;
                             if (elapsed > TimeSpan.FromMilliseconds(1000))
                             {
-                                parts[timeIndex] = $"[red]{milliseconds:N3}[/]";
+                                parts[timeIndex] = new Markup($"[red]{milliseconds:N3}[/]");
                             }
                             else if (elapsed > TimeSpan.FromMilliseconds(500))
                             {
-                                parts[timeIndex] = $"[darkorange3_1]{milliseconds:N3}[/]";
+                                parts[timeIndex] = new Markup($"[darkorange3_1]{milliseconds:N3}[/]");
                             }
                             else
                             {
-                                parts[timeIndex] = $"[darkgreen]{milliseconds:N3}[/]";
+                                parts[timeIndex] = new Markup($"[darkgreen]{milliseconds:N3}[/]");
                             }
 
                             table.AddRow(parts);
